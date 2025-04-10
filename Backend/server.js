@@ -1,9 +1,45 @@
 const express = require('express');
 const path = require('path');
 const dotenv = require('dotenv');
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
 const app = express();
 dotenv.config();
-// Import routes
+
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Tiberbu Scheduler API',
+      version: '1.0.0',
+      description: 'Medical Appointment Scheduling System API',
+      contact: {
+        name: 'API Support',
+        email: 'support@tiberbuscheduler.com'
+      }
+    },
+    servers: [
+      {
+        url: `http://localhost:${process.env.PORT || 4600}`,
+        description: 'Development server'
+      }
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT'
+        }
+      }
+    }
+  },
+  apis: ['./routes/*.js', './swagger/*.js'] // Path to the API docs
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 const patientRoutes = require('./routes/patientRoutes');
 const doctorRoutes = require('./routes/doctorRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
